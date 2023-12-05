@@ -1,4 +1,4 @@
-package santimcxyz.erp.Product;
+package santimcxyz.erp.Line;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,14 +8,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 
 @Entity
-public class Product {
+public class Line {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long lineId;
 
-    @NotNull(message = "barCode cannot be null")
-    @JsonProperty("barCode")
-    private Long barCode;
+    @NotNull(message = "transactionId cannot be null")
+    @JsonProperty("transactionId")
+    private Long transactionId;
+
+    @NotNull(message = "productId cannot be null")
+    @JsonProperty("productId")
+    private Long productId;
 
     @NotEmpty(message = "productName cannot be empty")
     @JsonProperty("productName")
@@ -33,19 +37,37 @@ public class Product {
     @JsonProperty("price")
     private float price;
 
-    public Product() {
+    public Line() {
     }
 
-    public Product(@NotNull(message = "barCode cannot be null") Long barCode,
+    public Line(@NotNull(message = "productId cannot be null") Long productId,
+            @NotNull(message = "transactionId cannot be empty") Long transactionId,
             @NotEmpty(message = "productName cannot be empty") String productName,
             @NotNull(message = "quantity cannot be null") int quantity,
             @NotNull(message = "taxes_pctg cannot be null") float taxes_pctg,
             @NotNull(message = "price cannot be null") float price) {
-        this.barCode = barCode;
+        this.productId = productId;
+        this.transactionId = transactionId;
         this.productName = productName;
         this.quantity = quantity;
         this.taxes_pctg = taxes_pctg;
         this.price = price;
+    }
+
+    public Long getLineId() {
+        return lineId;
+    }
+
+    public void setLineId(Long lineId) {
+        this.lineId = lineId;
+    }
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
     }
 
     public Long getProductId() {
@@ -54,14 +76,6 @@ public class Product {
 
     public void setProductId(Long productId) {
         this.productId = productId;
-    }
-
-    public Long getBarCode() {
-        return barCode;
-    }
-
-    public void setBarCode(Long barCode) {
-        this.barCode = barCode;
     }
 
     public String getProductName() {
@@ -95,5 +109,4 @@ public class Product {
     public void setPrice(float price) {
         this.price = price;
     }
-
 }

@@ -1,5 +1,6 @@
 package santimcxyz.erp.Product;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -14,8 +15,9 @@ public class Product {
     private Long productId;
 
     @NotNull(message = "barCode cannot be null")
+    @Column(unique = true)
     @JsonProperty("barCode")
-    private Long barCode;
+    private String barCode;
 
     @NotEmpty(message = "productName cannot be empty")
     @JsonProperty("productName")
@@ -36,7 +38,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(@NotNull(message = "barCode cannot be null") Long barCode,
+    public Product(@NotEmpty(message = "barCode cannot be null") String barCode,
             @NotEmpty(message = "productName cannot be empty") String productName,
             @NotNull(message = "quantity cannot be null") int quantity,
             @NotNull(message = "taxes_pctg cannot be null") float taxes_pctg,
@@ -56,11 +58,11 @@ public class Product {
         this.productId = productId;
     }
 
-    public Long getBarCode() {
+    public String getBarCode() {
         return barCode;
     }
 
-    public void setBarCode(Long barCode) {
+    public void setBarCode(String barCode) {
         this.barCode = barCode;
     }
 

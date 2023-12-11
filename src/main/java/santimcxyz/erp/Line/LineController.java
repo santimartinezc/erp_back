@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import santimcxyz.erp.Product.Product;
+import santimcxyz.erp.Product.ProductRepository;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -26,6 +28,8 @@ import jakarta.validation.Valid;
 public class LineController {
     @Autowired
     private LineRepository lineRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @GetMapping
     public List<Line> getAllLines(HttpServletRequest request) {
@@ -59,6 +63,12 @@ public class LineController {
     public ResponseEntity<Line> createLine(@Valid @RequestBody Line line,
             HttpServletRequest request) {
         Line savedLine = lineRepository.save(line);
+
+        Product product = productRepository.findById(line.getProductId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        product.setQuantity(product.getQuantity() - line.getQuantity());
+        productRepository.save(product);
+
         return new ResponseEntity<>(savedLine, HttpStatus.CREATED);
     }
 
@@ -67,6 +77,10 @@ public class LineController {
             HttpServletRequest request) {
         List<Line> savedLines = new ArrayList<>();
         for (Line line : lines) {
+            Product product = productRepository.findById(line.getProductId())
+                    .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+            product.setQuantity(product.getQuantity() - line.getQuantity());
+            productRepository.save(product);
             lineRepository.save(line);
         }
         return new ResponseEntity<>(savedLines, HttpStatus.CREATED);

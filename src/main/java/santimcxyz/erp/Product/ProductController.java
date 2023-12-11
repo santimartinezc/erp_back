@@ -1,9 +1,8 @@
 package santimcxyz.erp.Product;
 
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.PageRequest;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -49,7 +47,7 @@ public class ProductController {
     }
 
     @GetMapping("/barCode/{barCode}")
-    public ResponseEntity<Product> getProductByBarCode(@PathVariable Long barCode, HttpServletRequest request) {
+    public ResponseEntity<Product> getProductByBarCode(@PathVariable String barCode, HttpServletRequest request) {
         Optional<Product> productOptional = productRepository.findByBarCode(barCode);
 
         if (productOptional.isPresent()) {
@@ -60,10 +58,20 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product,
-            HttpServletRequest request) {
-        Product savedProduct = productRepository.save(product);
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+    public ResponseEntity<?> createProduct(@Valid @RequestBody Product product, HttpServletRequest request) {
+        try {
+            Product savedProduct = productRepository.save(product);
+            return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            // Aquí manejas la excepción específica de violación de integridad de datos.
+            // Puedes personalizar el mensaje de error según tus necesidades.
+            String errorMessage = "Error: El código de barras proporcionado ya existe en la base de datos.";
+            return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            // Manejo de otras posibles excepciones
+            String errorMessage = "Error al guardar el producto.";
+            return new ResponseEntity<>(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
